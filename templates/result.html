@@ -1,0 +1,200 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8" />-->
+<!--    <title>Prediction Result</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h2>Estimated Vehicle Price</h2>-->
+<!--    <p><strong>{{ prediction }}</strong></p>-->
+<!--    <a href="/">Try another prediction</a>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Prediction Result</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #eee;
+      margin: 0; padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #1e1e1e;
+      padding: 25px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 25px #6b46c1;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #9f7aea;
+    }
+    .prediction {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #fff;
+      text-shadow: 0 0 8px #9f7aea;
+    }
+    .charts {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 30px;
+    }
+    .chart {
+      flex: 1 1 300px;
+      background: #2a2a2a;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 12px #764ba2;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 35px;
+    }
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #444;
+      text-align: center;
+    }
+    th {
+      background-color: #6b46c1;
+      color: white;
+    }
+    tbody tr:hover {
+      background-color: #764ba2;
+    }
+    caption {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #9f7aea;
+    }
+    a.button {
+      display: inline-block;
+      margin: 30px auto 0;
+      padding: 12px 24px;
+      background: #764ba2;
+      color: white;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 0 15px #9f7aea;
+      transition: background 0.3s ease;
+    }
+    a.button:hover {
+      background: #5a3d91;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Estimated Vehicle Price</h1>
+    <div class="prediction">{{ prediction }}</div>
+
+    <h2>Price Distribution for {{ brand }}</h2>
+    <div id="priceChart" class="chart"></div>
+
+    <h2>Mileage vs Price for {{ brand }}</h2>
+    <div id="mileageChart" class="chart"></div>
+
+    <h2>Car Age vs Price for {{ brand }}</h2>
+    <div id="ageChart" class="chart"></div>
+
+    <h2>Recommended Similar Cars</h2>
+    {% if recommended %}
+      <table>
+        <thead>
+          <tr>
+            <th>Brand</th>
+            <th>Car Age (years)</th>
+            <th>Mileage per Year (km)</th>
+            <th>Price (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for car in recommended %}
+            <tr>
+              <td>{{ car.brand }}</td>
+              <td>{{ car.car_age }}</td>
+              <td>{{ "%.2f"|format(car.mileage_per_year) }}</td>
+              <td>{{ "{:,.2f}".format(car.selling_price) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No similar cars found.</p>
+    {% endif %}
+
+    <a href="/" class="button">Predict Another Price</a>
+  </div>
+
+  <script>
+    // Data from Flask (passed via Jinja)
+    const priceData = {{ price_data|tojson }};
+    const mileageData = {{ mileage_data|tojson }};
+    const ageData = {{ age_data|tojson }};
+
+    // Price Distribution Histogram
+    Plotly.newPlot('priceChart', [{
+      x: priceData,
+      type: 'histogram',
+      marker: {color: '#764ba2'}
+    }],
+    {
+      title: 'Price Distribution',
+      xaxis: {title: 'Price (₹)'},
+      yaxis: {title: 'Count'},
+      plot_bgcolor: '#1e1e1e',
+      paper_bgcolor: '#1e1e1e',
+      font: {color: '#eee'}
+    });
+
+    // Mileage vs Price Scatter (using priceData and mileageData arrays aligned by index)
+    Plotly.newPlot('mileageChart', [{
+      x: mileageData,
+      y: priceData,
+      mode: 'markers',
+      type: 'scatter',
+      marker: {color: '#9f7aea', size: 8}
+    }],
+    {
+      title: 'Mileage per Year vs Price',
+      xaxis: {title: 'Mileage per Year (km)'},
+      yaxis: {title: 'Price (₹)'},
+      plot_bgcolor: '#1e1e1e',
+      paper_bgcolor: '#1e1e1e',
+      font: {color: '#eee'}
+    });
+
+    // Car Age vs Price Scatter
+    Plotly.newPlot('ageChart', [{
+      x: ageData,
+      y: priceData,
+      mode: 'markers',
+      type: 'scatter',
+      marker: {color: '#764ba2', size: 8}
+    }],
+    {
+      title: 'Car Age vs Price',
+      xaxis: {title: 'Car Age (years)'},
+      yaxis: {title: 'Price (₹)'},
+      plot_bgcolor: '#1e1e1e',
+      paper_bgcolor: '#1e1e1e',
+      font: {color: '#eee'}
+    });
+  </script>
+</body>
+</html>

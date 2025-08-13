@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vehicle Price Prediction</title>
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+      color: #eee;
+      overflow-y: auto;
+    }
+
+    /* Dark overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      background: rgba(25, 25, 25, 0.85);
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+      width: 100%;
+      max-width: 480px;
+      margin: 40px auto;
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: 700;
+      font-size: 2rem;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 10px #6b46c1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #ddd;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      background: #222;
+      color: #eee;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 0 6px #111;
+      cursor: pointer;
+    }
+    select:hover, input[type="number"]:hover {
+      background: #333;
+    }
+    select:focus, input[type="number"]:focus {
+      background: #4c2f9b;
+      color: #fff;
+      box-shadow: 0 0 12px 3px #6b46c1;
+      cursor: text;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      cursor: pointer;
+      transition: background 0.4s ease, box-shadow 0.3s ease;
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.7);
+      text-shadow: 0 0 4px rgba(0,0,0,0.3);
+    }
+    button:hover {
+      background: linear-gradient(45deg, #5a67d8, #6b46c1);
+      box-shadow: 0 8px 30px rgba(107, 70, 193, 0.9);
+    }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+      .container {
+        margin: 20px;
+        padding: 25px 30px;
+      }
+      h2 {
+        font-size: 1.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Vehicle Price Prediction</h2>
+    <form action="/predict" method="post">
+
+      <label for="brand">Brand:</label>
+      <select name="brand" required>
+        {% for option in allowed['brand'] %}
+          <option value="{{ option }}">{{ option }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="fuel">Fuel Type:</label>
+      <select name="fuel" required>
+        {% for option in allowed['fuel'] %}
+          <option value="{{ option }}">{{ option }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="seller_type">Seller Type:</label>
+      <select name="seller_type" required>
+        {% for option in allowed['seller_type'] %}
+          <option value="{{ option }}">{{ option }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="transmission">Transmission:</label>
+      <select name="transmission" required>
+        {% for option in allowed['transmission'] %}
+          <option value="{{ option }}">{{ option }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="owner">Owner:</label>
+      <select name="owner" required>
+        {% for option in allowed['owner'] %}
+          <option value="{{ option }}">{{ option }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="car_age">Car Age (years):</label>
+      <input type="number" name="car_age" min="0" max="50" required placeholder="E.g., 6" />
+
+      <label for="mileage_per_year">Mileage per Year (km):</label>
+      <input type="number" name="mileage_per_year" min="0" max="50000" step="any" required placeholder="E.g., 4000" />
+
+      <button type="submit">Predict Price</button>
+    </form>
+  </div>
+</body>
+</html>
